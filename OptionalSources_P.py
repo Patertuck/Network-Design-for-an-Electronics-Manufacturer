@@ -122,7 +122,7 @@ for optionalSource in OPTIONALSOURCE:
 # 20.11
 # objective function: minimize sum of co2 emission to send from DC to Retailer with cost (distance*co2cost) per unit
 total_cost = sum(
-    l["var"] * (variablecost[l["start"]] + 1250000) if l["part"] == "o" else 0
+    l["var"] * (variablecost[l["start"]] + OPENINGCOST) if l["part"] == "o" else 0
     for l in decision_vars
 )
 
@@ -141,7 +141,7 @@ obj_func = (
         j["var"] * sourcingcost[j["start"]] for j in decision_vars if j["part"] == "z"
     )
     + sum(
-        1250000 * var_entry["build"]
+        OPENINGCOST * var_entry["build"]
         for var_entry in decision_vars
         if var_entry["part"] == "o"
     )
@@ -281,6 +281,12 @@ variable_cost_final = 0
 total_opening_cost = 0
 sourcing_cost_final = 0
 
+DC_amount = {key["LocationID"]: 0 for key in DC}
+CD_amount = {key["LocationID"]: 0 for key in CD}
+SOURCE_amount = {key["LocationID"]: 0 for key in SOURCE}
+OPTIONALSOURCE_amount = {key["LocationID"]: 0 for key in OPTIONALSOURCE}
+
+
 
 for v in decision_vars:
     CO2_emission_cost += (
@@ -311,9 +317,7 @@ for v in decision_vars:
     else:
         OPTIONALSOURCE_amount[v["start"]] += v["var"].x
         variable_cost_final += v["var"].x * variablecost[v["start"]]
-        total_opening_cost += v["build"].x * (
-            openingcost[v["start"]] + operationalcost[v["start"]]
-        )
+        total_opening_cost += v["build"].x * (OPENINGCOST)
 
 
 print("------- Costs ----------------")

@@ -18,7 +18,7 @@ retailer_decision_vars = []
 # retailer_decision_vars is a list of dicts: {var: GRB.var, LocationID, Position, Role, NodeID}
 for i in RETAILER:
     varname = i["LocationID"]
-    a = opt_mod.addVar(name=varname, vtype=BINARY)
+    a = opt_mod.addVar(name=varname, vtype = BINARY)
     copy = i.copy()
     copy["var"] = a
     retailer_decision_vars.append(copy)
@@ -35,7 +35,6 @@ decision_vars = []
 
 # decision_vars: list of dicts, one dict correspond to one decision variable. Each decision variable has a GRB.var, part of supply chain (x,y,z), start node, destination node, transport mode, timeBucketstart, timeBucketEnd.
 # start node id and destination node id as index
-
 
 # DC to retailers
 # attempt using ID as index
@@ -89,40 +88,6 @@ for source in SOURCE:
                 "mode": k,
             }
             decision_vars.append(var_entry)
-
-"""Attempt to use index to refer to nodes
-#attemt without time bucket
-
-for i in range(NUMOFDC):
-    for j in range(NUMOFRETAILER):
-        for k in co2cost.keys():
-            varname = "x"+k+str(i)+str(j)
-            a = opt_mod.addVar(name=varname, vtype = INTEGER, lb = 0) #lb = lower bound
-
-            
-
-
-#CD to DC
-
-for i in range(NUMOFCD):
-    for j in range(NUMOFDC):
-        for k in co2cost.keys():
-            varname = "y"+k+str(i)+str(j)
-            a = opt_mod.addVar(name=varname, vtype = INTEGER, lb = 0) #lb = lower bound
-
-            
-#Source to CD
-
-for i in range(NUMOFSOURCE):
-    for j in range(NUMOFCD):
-        for k in co2cost.keys():
-            if k == 'road':
-                continue
-            varname = "z"+k+str(i)+str(j)
-            a = opt_mod.addVar(name=varname, vtype = INTEGER, lb = 0) #lb = lower bound            
-
-#decision_vars contains the amount to ship from one node to another
-"""
 
 
 # --------------- working up to here on 18.11
@@ -273,6 +238,8 @@ CO2_emission_cost = 0
 transport_cost = 0
 slowness_cost = 0
 handling_cost = 0
+sourcing_cost_final = 0
+
 for v in decision_vars:
     CO2_emission_cost += (
         v["var"].x
@@ -304,8 +271,10 @@ for v in decision_vars:
 
     else:
         SOURCE_amount[v["start"]] += v["var"].x
+        sourcing_cost_final += v["var"].x * sourcingcost[v["start"]]
 
 print()
+print(f"The minimal CO2 emission without Optional Sources: {current_optimum}g")
 print(
     f"Given the CO2 price of {CO2PRICE}$ per tonne, the minimal total cost: {current_optimum}$".format(
         current_optimum
@@ -319,6 +288,7 @@ print(
 print(f"Transport cost: {transport_cost}$")
 print(f"Slowness cost: {slowness_cost}$")
 print(f"Handling cost: {handling_cost}$")
+print(f"Sourcing cost: {sourcing_cost_final}")
 print()
 
 # ----- print costs ------------------
