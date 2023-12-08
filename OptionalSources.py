@@ -137,14 +137,12 @@ obj_func = (
     )
     + optionalCost
     + sum(
-        list(
-            j["var"] * sourcingcost[j["start"]]
-            for j in decision_vars
-            if j["part"] == "z"
-            for distance_entry in distance_data
-            if distance_entry["start"] == j["start"]
-            and distance_entry["end"] == j["dest"]
-        )
+        j["var"] * sourcingcost[j["start"]] for j in decision_vars if j["part"] == "z"
+    )
+    + sum(
+        j["var"] * handlingcost[j["start"]]
+        for j in decision_vars
+        if j["part"] == "y" or j["part"] == "x"
     )
 )
 
@@ -289,4 +287,8 @@ print(CD_amount)
 print(DC_amount)
 print(demands)
 print(OPTIONALSOURCE_amount)
+for i in OPTIONALSOURCE_amount.keys():
+    if OPTIONALSOURCE_amount[i] != 0:
+        print(i, OPTIONALSOURCE_amount[i])
+
 # print(OPTIONALSOURCE_amount)
