@@ -96,7 +96,7 @@ for optionalSource in OPTIONALSOURCE:
             "part": "o",  # x = DC to retailer in the supply chain
             "start": optionalSource["LocationID"],
             "dest": dc["LocationID"],
-            "build": build
+            "build": build,
         }
         decision_vars.append(var_entry)
 
@@ -118,24 +118,35 @@ for optionalSource in OPTIONALSOURCE:
 
 # 20.11
 # objective function: minimize sum of co2 emission to send from DC to Retailer with cost (distance*co2cost) per unit
-optionalCost = sum(1250000 * var_entry["build"] for var_entry in decision_vars if var_entry["part"] == "o")
+optionalCost = sum(
+    1250000 * var_entry["build"]
+    for var_entry in decision_vars
+    if var_entry["part"] == "o"
+)
 
 
-obj_func = (sum(
-    j["var"] * distance_entry["distance"] * transportcost["air"]
-    for j in decision_vars
-    for distance_entry in distance_data
-    if distance_entry["start"] == j["start"] and distance_entry["end"] == j["dest"]
-) + sum(
-    l["var"] * variablecost[l["start"]]
-    for l in decision_vars
-    if l["part"] == "o"
-) + optionalCost + sum(list(j["var"] * sourcingcost[j["start"]]
-       for j in decision_vars if j["part"] == 'z'
-       for distance_entry in distance_data if distance_entry["start"] == j["start"]
-       and distance_entry["end"] == j["dest"])))
-
-
+obj_func = (
+    sum(
+        j["var"] * distance_entry["distance"] * transportcost["air"]
+        for j in decision_vars
+        for distance_entry in distance_data
+        if distance_entry["start"] == j["start"] and distance_entry["end"] == j["dest"]
+    )
+    + sum(
+        l["var"] * variablecost[l["start"]] for l in decision_vars if l["part"] == "o"
+    )
+    + optionalCost
+    + sum(
+        list(
+            j["var"] * sourcingcost[j["start"]]
+            for j in decision_vars
+            if j["part"] == "z"
+            for distance_entry in distance_data
+            if distance_entry["start"] == j["start"]
+            and distance_entry["end"] == j["dest"]
+        )
+    )
+)
 
 
 """ obj_func = sum([item["var"] * co2cost[mode] for item in decision_vars["x"][mode] for mode in co2cost.keys()]) + sum([item["var"] * co2cost[mode] for item in decision_vars["y"][mode] for mode in co2cost.keys()]) + sum([item["var"] * co2cost[mode] for item in decision_vars["z"][mode] for mode in co2cost.keys()]) """
@@ -194,8 +205,10 @@ for dc in DC:
             list(
                 j["var"]
                 for j in decision_vars
-                if j["part"] == "y" and j["dest"] == dc["LocationID"]
-                or j["part"] == "o" and j["dest"] == dc["LocationID"]
+                if j["part"] == "y"
+                and j["dest"] == dc["LocationID"]
+                or j["part"] == "o"
+                and j["dest"] == dc["LocationID"]
             )
         )
         == amount_dc
@@ -265,14 +278,15 @@ for v in decision_vars:
         CD_amount[v["start"]] += v["var"].x
     elif v["part"] == "z":
         SOURCE_amount[v["start"]] += v["var"].x
-    # else:
-    #     OPTIONALSOURCE_amount[v["start"]] += v["var"].x
-    #
-    # dist = get_distance(distance_data, v["start"], v["dest"])
+
+    else:
+        OPTIONALSOURCE_amount[v["start"]] += v["var"].x
+
+    dist = get_distance(distance_data, v["start"], v["dest"])
 
 print(SOURCE_amount)
 print(CD_amount)
 print(DC_amount)
 print(demands)
-#print(OPTIONALSOURCE_amount)
-print ("Optional cost: {}".format(optionalCost))
+print(OPTIONALSOURCE_amount)
+# print(OPTIONALSOURCE_amount)

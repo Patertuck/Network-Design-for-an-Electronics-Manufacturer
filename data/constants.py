@@ -20,6 +20,7 @@ OPTIONALSOURCE = []
 DATAENTRYATTS = []
 CO2PRICE = 70
 OPENINGCOST = 125000
+GRAMM_TO_TONNE = 1000000
 
 
 path = os.path.dirname(os.path.abspath(__file__))
@@ -124,6 +125,7 @@ def get_demands():
 # nodes is list of all node/ location: {LocationID, Position, Role, NodeID}, start and end are node ID
 nodes = get_nodes()
 data_entries = get_data_entries()
+
 # data_entries is now list of dicts, one dict represents one row in excel, keys are attribute names, value are values
 
 
@@ -146,10 +148,18 @@ for data in data_entries:
 # [{start, roleStart, end, roleEnd, distance}, ...], start and end are LocationID
 distance_data = get_distance_data()
 
+distancesMap = {}
+for entry in distance_data:
+    if entry["start"] in distancesMap.keys():
+        distancesMap[entry["start"]][entry["end"]] = entry["distance"]
+    else:
+        distancesMap[entry["start"]] = {entry["end"]: entry["distance"]}
+
 
 DC_amount = {key["LocationID"]: 0 for key in DC}
 CD_amount = {key["LocationID"]: 0 for key in CD}
 SOURCE_amount = {key["LocationID"]: 0 for key in SOURCE}
+OPTIONALSOURCE_amount = {key["LocationID"]: 0 for key in OPTIONALSOURCE}
 
 # each element is the sum of the amount at one DC
 # in constraint: for key in DC_amount.keys(): DC_amount[key] <= DC_constraints[key]

@@ -1,6 +1,8 @@
 import pandas as pd
 from gurobipy import *
-from constants import *
+from data.constants import *
+
+transportcost = transportcost["air"]
 
 opt_mod = Model(name="OptionalSourcesP")
 
@@ -97,7 +99,7 @@ for optionalSource in OPTIONALSOURCE:
             "part": "o",  # x = DC to retailer in the supply chain
             "start": optionalSource["LocationID"],
             "dest": dc["LocationID"],
-            "build": build
+            "build": build,
         }
         decision_vars.append(var_entry)
 
@@ -125,23 +127,35 @@ total_cost = sum(
 )
 
 
-obj_func = sum(
-    j["var"] * distance_entry["distance"] * transportcost
-    for j in decision_vars
-    for distance_entry in distance_data
-    if distance_entry["start"] == j["start"] and distance_entry["end"] == j["dest"]
-) + sum(
-    l["var"] * variablecost[l["start"]]
-    for l in decision_vars
-    if l["part"] == "o"
-) + sum(
-    j["var"] * sourcingcost[j["start"]]
-    for j in decision_vars
-    if j["part"] == "z"
-) + sum(
-    1250000 * var_entry["build"] for var_entry in decision_vars if var_entry["part"] == "o"
-) + sum(list(j["var"] * handlingcost[j["start"]] for j in decision_vars if j["part"] == 'y' or j["part"] == 'x' for distance_entry in distance_data if distance_entry["start"] == j["start"] and distance_entry["end"] == j["dest"]))
-
+obj_func = (
+    sum(
+        j["var"] * distance_entry["distance"] * transportcost
+        for j in decision_vars
+        for distance_entry in distance_data
+        if distance_entry["start"] == j["start"] and distance_entry["end"] == j["dest"]
+    )
+    + sum(
+        l["var"] * variablecost[l["start"]] for l in decision_vars if l["part"] == "o"
+    )
+    + sum(
+        j["var"] * sourcingcost[j["start"]] for j in decision_vars if j["part"] == "z"
+    )
+    + sum(
+        1250000 * var_entry["build"]
+        for var_entry in decision_vars
+        if var_entry["part"] == "o"
+    )
+    + sum(
+        list(
+            j["var"] * handlingcost[j["start"]]
+            for j in decision_vars
+            if j["part"] == "y" or j["part"] == "x"
+            for distance_entry in distance_data
+            if distance_entry["start"] == j["start"]
+            and distance_entry["end"] == j["dest"]
+        )
+    )
+)
 
 
 """ obj_func = sum([item["var"] * co2cost[mode] for item in decision_vars["x"][mode] for mode in co2cost.keys()]) + sum([item["var"] * co2cost[mode] for item in decision_vars["y"][mode] for mode in co2cost.keys()]) + sum([item["var"] * co2cost[mode] for item in decision_vars["z"][mode] for mode in co2cost.keys()]) """
@@ -200,8 +214,10 @@ for dc in DC:
             list(
                 j["var"]
                 for j in decision_vars
-                if j["part"] == "y" and j["dest"] == dc["LocationID"]
-                or j["part"] == "o" and j["dest"] == dc["LocationID"]
+                if j["part"] == "y"
+                and j["dest"] == dc["LocationID"]
+                or j["part"] == "o"
+                and j["dest"] == dc["LocationID"]
             )
         )
         == amount_dc
@@ -226,8 +242,6 @@ for cd in CD:
         )
         == amount_cd
     )
-
-
 
 
 # --- constraints -----------------------------
@@ -269,12 +283,22 @@ sourcing_cost_final = 0
 
 
 for v in decision_vars:
-    
-    CO2_emission_cost += v["var"].x * get_distance(distance_data, v["start"], v["dest"]) * co2cost["air"]*CO2PRICE / 1000
-    transport_cost += v["var"].x * get_distance(distance_data, v["start"], v["dest"]) * transportcost
-    slowness_cost += v["var"].x * get_distance(distance_data, v["start"], v["dest"]) * slowcost["air"]
-    
-    
+    CO2_emission_cost += (
+        v["var"].x
+        * get_distance(distance_data, v["start"], v["dest"])
+        * co2cost["air"]
+        * CO2PRICE
+        / 1000
+    )
+    transport_cost += (
+        v["var"].x * get_distance(distance_data, v["start"], v["dest"]) * transportcost
+    )
+    slowness_cost += (
+        v["var"].x
+        * get_distance(distance_data, v["start"], v["dest"])
+        * slowcost["air"]
+    )
+
     if v["part"] == "x":
         DC_amount[v["start"]] += v["var"].x
         handling_cost_final += v["var"].x * handlingcost[v["start"]]
@@ -287,23 +311,29 @@ for v in decision_vars:
     else:
         OPTIONALSOURCE_amount[v["start"]] += v["var"].x
         variable_cost_final += v["var"].x * variablecost[v["start"]]
-        total_opening_cost += v["build"].x * (openingcost[v["start"]] + operationalcost[v["start"]])
+        total_opening_cost += v["build"].x * (
+            openingcost[v["start"]] + operationalcost[v["start"]]
+        )
 
 
 print("------- Costs ----------------")
 
 print()
-print(f"The minimal cost to transport with optional sources (air): {current_optimum}$")        
+print(f"The minimal cost to transport with optional sources (air): {current_optimum}$")
 print(f"Cost to compensate CO2 emission: {CO2_emission_cost} $")
 print(f"CO2 emission in tonnes: {CO2_emission_cost/CO2PRICE} t")
-print(f"Cost to transport the products: {transport_cost + slowness_cost + handling_cost_final}$")
+print(
+    f"Cost to transport the products: {transport_cost + slowness_cost + handling_cost_final}$"
+)
 print(f"Transport cost: {transport_cost}$")
 print(f"Slowness cost: {slowness_cost}$")
 print(f"Sourcing cost: {sourcing_cost_final}")
 print(f"Handling cost: {handling_cost_final}$")
 print(f"Variable cost: {variable_cost_final}$")
 print(f"Opening and operational costs: {total_opening_cost}$")
-print(f"Added up (without slowness): {transport_cost + handling_cost_final + variable_cost_final + total_opening_cost}")
+print(
+    f"Added up (without slowness): {transport_cost + handling_cost_final + variable_cost_final + total_opening_cost}"
+)
 print(f"Total cost: {current_optimum + CO2_emission_cost}$")
 print()
 
