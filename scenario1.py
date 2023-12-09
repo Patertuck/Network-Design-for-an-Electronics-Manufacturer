@@ -92,8 +92,7 @@ for source in SOURCE:
 minCosts = sum(
     j["var"]
     * (
-        get_distance(distance_data, j["start"], j["dest"])
-        * (transportcost["air"] + slowcost["air"])
+        get_distance(distance_data, j["start"], j["dest"]) * (transportcost["air"])
         + locationCosts[j["part"]][j["start"]]
     )
     for j in decision_vars
