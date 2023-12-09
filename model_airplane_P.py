@@ -246,7 +246,8 @@ for v in decision_vars:
         * get_distance(distance_data, v["start"], v["dest"])
         * co2cost["air"]
         * CO2PRICE
-        / 1000
+    # to get tonne
+        / GRAMM_TO_TONNE
     )
     transport_cost += (
         v["var"].x

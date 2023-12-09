@@ -18,7 +18,7 @@ SOURCE = []
 RETAILER = []
 OPTIONALSOURCE = []
 DATAENTRYATTS = []
-CO2PRICE = 70
+CO2PRICE = 80
 OPENINGCOST = 1250000
 GRAMM_TO_TONNE = 1000000
 
@@ -59,7 +59,6 @@ def get_data_entries():
         data_entries.append(entry)
 
     return data_entries
-
 
 def get_distance_data():
     distance_read = pd.read_csv(path + "/distances.csv", delimiter=";")
