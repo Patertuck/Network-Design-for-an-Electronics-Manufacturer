@@ -122,7 +122,7 @@ for optionalSource in OPTIONALSOURCE:
 # 20.11
 # objective function: minimize sum of co2 emission to send from DC to Retailer with cost (distance*co2cost) per unit
 total_cost = sum(
-    l["var"] * (variablecost[l["start"]] + 1250000) if l["part"] == "o" else 0
+    l["var"] * (variablecost[l["start"]] + OPENINGCOST) if l["part"] == "o" else 0
     for l in decision_vars
 )
 
@@ -141,7 +141,7 @@ obj_func = (
         j["var"] * sourcingcost[j["start"]] for j in decision_vars if j["part"] == "z"
     )
     + sum(
-        1250000 * var_entry["build"]
+        OPENINGCOST * var_entry["build"]
         for var_entry in decision_vars
         if var_entry["part"] == "o"
     )
@@ -281,24 +281,20 @@ variable_cost_final = 0
 total_opening_cost = 0
 sourcing_cost_final = 0
 
+DC_amount = {key["LocationID"]: 0 for key in DC}
+CD_amount = {key["LocationID"]: 0 for key in CD}
+SOURCE_amount = {key["LocationID"]: 0 for key in SOURCE}
+OPTIONALSOURCE_amount = {key["LocationID"]: 0 for key in OPTIONALSOURCE}
+
+
 
 for v in decision_vars:
-    CO2_emission_cost += (
-        v["var"].x
-        * get_distance(distance_data, v["start"], v["dest"])
-        * co2cost["air"]
-        * CO2PRICE
-        / 1000
-    )
-    transport_cost += (
-        v["var"].x * get_distance(distance_data, v["start"], v["dest"]) * transportcost
-    )
-    slowness_cost += (
-        v["var"].x
-        * get_distance(distance_data, v["start"], v["dest"])
-        * slowcost["air"]
-    )
-
+    
+    CO2_emission_cost += v["var"].x * get_distance(distance_data, v["start"], v["dest"]) * co2cost["air"]*CO2PRICE / GRAMM_TO_TONNE
+    transport_cost += v["var"].x * get_distance(distance_data, v["start"], v["dest"]) * transportcost
+    slowness_cost += v["var"].x * get_distance(distance_data, v["start"], v["dest"]) * slowcost["air"]
+    
+    
     if v["part"] == "x":
         DC_amount[v["start"]] += v["var"].x
         handling_cost_final += v["var"].x * handlingcost[v["start"]]
@@ -311,31 +307,26 @@ for v in decision_vars:
     else:
         OPTIONALSOURCE_amount[v["start"]] += v["var"].x
         variable_cost_final += v["var"].x * variablecost[v["start"]]
-        total_opening_cost += v["build"].x * (
-            openingcost[v["start"]] + operationalcost[v["start"]]
-        )
+        total_opening_cost += v["build"].x * (OPENINGCOST)
 
 
 print("------- Costs ----------------")
 
 print()
-print(f"The minimal cost to transport with optional sources (air): {current_optimum}$")
+print(f"The minimal cost to transport with optional sources (air): {current_optimum}$")        
 print(f"Cost to compensate CO2 emission: {CO2_emission_cost} $")
 print(f"CO2 emission in tonnes: {CO2_emission_cost/CO2PRICE} t")
-print(
-    f"Cost to transport the products: {transport_cost + slowness_cost + handling_cost_final}$"
-)
+print(f"Cost to transport the products: {transport_cost + slowness_cost + handling_cost_final}$")
 print(f"Transport cost: {transport_cost}$")
-print(f"Slowness cost: {slowness_cost}$")
+#print(f"Slowness cost: {slowness_cost}$")
 print(f"Sourcing cost: {sourcing_cost_final}")
 print(f"Handling cost: {handling_cost_final}$")
 print(f"Variable cost: {variable_cost_final}$")
 print(f"Opening and operational costs: {total_opening_cost}$")
-print(
-    f"Added up (without slowness): {transport_cost + handling_cost_final + variable_cost_final + total_opening_cost}"
-)
+print(f"Added up (without slowness): {transport_cost + handling_cost_final + variable_cost_final + total_opening_cost}")
 print(f"Total cost: {current_optimum + CO2_emission_cost}$")
 print()
+
 
 
 print("------- Amounts --------------")
