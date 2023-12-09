@@ -305,7 +305,7 @@ print(
 print(f"Cost to compensate CO2 emission: {CO2_emission_cost}$")
 print(f"CO2 emission in tonnes: {CO2_emission_cost/CO2PRICE}t")
 print(
-    f"Cost to transport the products (sourcing cost): {transport_cost + slowness_cost + handling_cost}$"
+    f"Cost to transport the products (sourcing cost): {transport_cost + slowness_cost + handling_cost + sourcing_cost}$"
 )
 print(f"Transport cost: {transport_cost}$")
 print(f"Slowness cost: {slowness_cost} $")
