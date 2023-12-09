@@ -289,22 +289,12 @@ OPTIONALSOURCE_amount = {key["LocationID"]: 0 for key in OPTIONALSOURCE}
 
 
 for v in decision_vars:
-    CO2_emission_cost += (
-        v["var"].x
-        * get_distance(distance_data, v["start"], v["dest"])
-        * co2cost["air"]
-        * CO2PRICE
-        / 1000
-    )
-    transport_cost += (
-        v["var"].x * get_distance(distance_data, v["start"], v["dest"]) * transportcost
-    )
-    slowness_cost += (
-        v["var"].x
-        * get_distance(distance_data, v["start"], v["dest"])
-        * slowcost["air"]
-    )
-
+    
+    CO2_emission_cost += v["var"].x * get_distance(distance_data, v["start"], v["dest"]) * co2cost["air"]*CO2PRICE / GRAMM_TO_TONNE
+    transport_cost += v["var"].x * get_distance(distance_data, v["start"], v["dest"]) * transportcost
+    slowness_cost += v["var"].x * get_distance(distance_data, v["start"], v["dest"]) * slowcost["air"]
+    
+    
     if v["part"] == "x":
         DC_amount[v["start"]] += v["var"].x
         handling_cost_final += v["var"].x * handlingcost[v["start"]]
@@ -323,23 +313,20 @@ for v in decision_vars:
 print("------- Costs ----------------")
 
 print()
-print(f"The minimal cost to transport with optional sources (air): {current_optimum}$")
+print(f"The minimal cost to transport with optional sources (air): {current_optimum}$")        
 print(f"Cost to compensate CO2 emission: {CO2_emission_cost} $")
 print(f"CO2 emission in tonnes: {CO2_emission_cost/CO2PRICE} t")
-print(
-    f"Cost to transport the products: {transport_cost + slowness_cost + handling_cost_final}$"
-)
+print(f"Cost to transport the products: {transport_cost + slowness_cost + handling_cost_final}$")
 print(f"Transport cost: {transport_cost}$")
-print(f"Slowness cost: {slowness_cost}$")
+#print(f"Slowness cost: {slowness_cost}$")
 print(f"Sourcing cost: {sourcing_cost_final}")
 print(f"Handling cost: {handling_cost_final}$")
 print(f"Variable cost: {variable_cost_final}$")
 print(f"Opening and operational costs: {total_opening_cost}$")
-print(
-    f"Added up (without slowness): {transport_cost + handling_cost_final + variable_cost_final + total_opening_cost}"
-)
+print(f"Added up (without slowness): {transport_cost + handling_cost_final + variable_cost_final + total_opening_cost}")
 print(f"Total cost: {current_optimum + CO2_emission_cost}$")
 print()
+
 
 
 print("------- Amounts --------------")
