@@ -326,76 +326,96 @@ class ElectronicManufacturerModel:
                 self.OPTIONALSOURCE_amount[v["start"]] += v["var"].x
 
     def report(self):
-        print()
-        print("----------- start report ----------")
-        print()
-        print(f"Objective Function Value: {self.getOptimalvalue()}")
-        print()
-        print("------- Nodes --------")
-        print()
-        for v in self.opt_mod.getVars():
-            if (
-                v.varName.startswith("x")
-                or v.varName.startswith("y")
-                or v.varName.startswith("z")
-                or v.varName.startswith("o")
-            ):
-                if v.x != 0:
-                    print("%s: %g" % (v.varName, v.x))
-        print()
-        print("------- Costs --------")
-        print()
-        print(f"Total cost: {self.getTotalCost()} Euro")
-        if self.withAllTransport:
-            print(f"Slowness cost: {self.getSlownesCost()} Euro")
-        print(f"Transportation cost: {self.getTransportCost()} Euro")
-        print(f"Sourcing costs: {self.getSourcingCost()} Euro")
-        print(f"Handling costs at cross docs: {self.getHandlingCostCd()} Euro")
-        print(
-            f"Handling costs at distribution centers: {self.getHandlingCostDc()} Euro"
-        )
-        print(f"Variable costs at optional source: {self.getVariableCost()} Euro")
-        print(f"Opening costs at optional source: {self.getOpeningCosts()} Euro")
-        print()
-        print("------- Emissions -------")
-        print()
-        print(f"Total Co2 emissions: {self.getCo2EmissionsInT()} t")
-        print(f"Cost for compensation: {self.getCo2EmissionsInT() * CO2PRICE} Euro")
-        print(f"Emissions between retailer and cross doc: {self.getCo2EmissionZ()} t")
-        print(
-            f"Emissions between cross doc and dsitribution center: {self.getCo2EmissionY()} t"
-        )
-        print(
-            f"Emissions between optional source and distribution center: {self.getCo2EmissionO()} t"
-        )
-        print(
-            f"Emissions between distribution center and retailer: {self.getCo2EmissionX()} t"
-        )
-        print()
-        print(("--------- Amouts --------"))
-        print()
-        print(f"Sources: {SOURCE_amount}")
-        print(f"Cross Docs: {CD_amount}")
-        print(f"Distribution centers: {DC_amount}")
-        print(f"Demands ad retailers: {demands}")
-        print(f"Optional sources: {OPTIONALSOURCE_amount}")
-        print()
-        print("--------- end report ------------")
-        print()
+        with open(f"{self.opt_mod.modelName}.txt", "w") as file:
+            file.write("\n")
+            file.write("----------- start report ----------")
+            file.write("\n")
+            file.write(f"Objective Function Value: {self.getOptimalvalue()}")
+            file.write("\n")
+            file.write("------- Nodes --------")
+            file.write("\n")
+            for v in self.opt_mod.getVars():
+                if (
+                    v.varName.startswith("x")
+                    or v.varName.startswith("y")
+                    or v.varName.startswith("z")
+                    or v.varName.startswith("o")
+                ):
+                    if v.x != 0:
+                        file.write(f"{v.varName}: {v.x}\n")
+            file.write("\n")
+            file.write("------- Costs --------\n")
+            file.write("\n")
+            file.write(
+                f"Total cost without Co2 compensation: {self.getTotalCost()} Euro\n"
+            )
+            if self.withAllTransport:
+                file.write(f"Slowness cost: {self.getSlownesCost()} Euro\n")
+            file.write(f"Transportation cost: {self.getTransportCost()} Euro\n")
+            file.write(f"Sourcing costs: {self.getSourcingCost()} Euro\n")
+            file.write(
+                f"Handling costs at cross docs: {self.getHandlingCostCd()} Euro\n"
+            )
+            file.write(
+                f"Handling costs at distribution centers: {self.getHandlingCostDc()} Euro\n"
+            )
+            file.write(
+                f"Variable costs at optional source: {self.getVariableCost()} Euro\n"
+            )
+            file.write(
+                f"Opening costs at optional source: {self.getOpeningCosts()} Euro\n"
+            )
+            file.write("\n")
+            file.write("------- Emissions -------\n")
+            file.write("\n")
+            file.write(
+                f"Total cost with emission compensation: {self.getCo2EmissionsInT() * CO2PRICE + self.getTotalCost()} Euro\n"
+            )
+            file.write(f"Total Co2 emissions: {self.getCo2EmissionsInT()} t\n")
+            file.write(
+                f"Cost for compensation: {self.getCo2EmissionsInT() * CO2PRICE} Euro\n"
+            )
+            file.write(
+                f"Emissions between retailer and cross doc: {self.getCo2EmissionZ()} t\n"
+            )
+            file.write(
+                f"Emissions between cross doc and dsitribution center: {self.getCo2EmissionY()} t\n"
+            )
+            file.write(
+                f"Emissions between optional source and distribution center: {self.getCo2EmissionO()} t\n"
+            )
+            file.write(
+                f"Emissions between distribution center and retailer: {self.getCo2EmissionX()} t\n"
+            )
+            self.getLocationAmounts()
+            file.write("\n")
+            file.write(("--------- Amouts --------\n"))
+            file.write("\n")
+            file.write(f"Sources: {self.SOURCE_amount}\n")
+            file.write(f"Cross Docs: {self.CD_amount}\n")
+            file.write(f"Distribution centers: {self.DC_amount}\n")
+            file.write(f"Demands ad retailers: {demands}\n")
+            file.write(f"Optional sources: {self.OPTIONALSOURCE_amount}\n")
+            file.write("\n")
+            file.write("--------- end report ------------\n")
+            file.write("\n")
 
-    def minCostsOnlyAir(self):
+    def setOpjectivefunctionMinimize(self, minFunction):
+        obj_func = minFunction()
+        self.opt_mod.setObjective(obj_func, GRB.MINIMIZE)
+
+    def minCostAir(self):
         minCosts = sum(
             j["var"]
             * (
-                get_distance(distance_data, j["start"], j["dest"])
-                * (transportcost["air"])
+                distancesMap[j["start"]][j["dest"]] * transportcost["air"]
                 + locationCosts[j["part"]][j["start"]]
             )
             for j in self.decision_vars
         )
         return minCosts
 
-    def minCostsAlltransport(self):
+    def minCostAlltransport(self):
         minCosts = sum(
             j["var"]
             * (
@@ -407,92 +427,70 @@ class ElectronicManufacturerModel:
         )
         return minCosts
 
-    def minCo2OptionalSources(self):
-        func1 = (
+    def minCo2Cost(self):
+        minCosts = (
             CO2PRICE
             * sum(
-                list(
-                    j["var"] * distance_entry["distance"] * co2cost[j["mode"]]
-                    for j in self.decision_vars
-                    for distance_entry in distance_data
-                    if distance_entry["start"] == j["start"]
-                    and distance_entry["end"] == j["dest"]
-                )
+                j["var"] * distancesMap[j["start"]][j["dest"]] * co2cost[j["mode"]]
+                for j in self.decision_vars
+            )
+            / GRAMM_TO_TONNE
+        )
+        return minCosts
+
+    def minEmissions(self):
+        minEmissions = (
+            sum(
+                j["var"] * distancesMap[j["start"]][j["dest"]] * co2cost[j["mode"]]
+                for j in self.decision_vars
             )
             / GRAMM_TO_TONNE
         )
 
-        func2 = sum(
-            list(
-                v["var"]
-                * (slowcost[v["mode"]] + transportcost[v["mode"]])
-                * get_distance(distance_data, v["start"], v["dest"])
-                for v in self.decision_vars
-            )
-        )
+        return minEmissions
 
-        func3 = sum(
-            list(
-                v["var"] * handlingcost[v["start"]]
-                for v in self.decision_vars
-                if v["part"] == "y" or v["part"] == "x"
-            )
-        )
+    def minOpenincost(self):
+        alreadyDone = []
+        costs = 0
+        for v in self.decision_vars:
+            if v["part"] == "o" and v["start"] not in alreadyDone:
+                costs += OPENINGCOST * v["build"]
+                alreadyDone.append(v["start"])
+        return costs
 
-        func4 = sum(
-            list(
-                j["var"] * sourcingcost[j["start"]]
-                for j in self.decision_vars
-                if j["part"] == "z"
-                for distance_entry in distance_data
-                if distance_entry["start"] == j["start"]
-                and distance_entry["end"] == j["dest"]
-            )
-        )
+    def minCo2CostAlltransportOs(self):
+        func1 = self.minCo2Cost()
+        func2 = self.minCostAlltransport()
+        func3 = self.minOpenincost()
+        return func1 + func2 + func3
 
-        func5 = sum(
-            OPENINGCOST * var_entry["build"]
-            + var_entry["var"] * variablecost[var_entry["start"]]
-            for var_entry in self.decision_vars
-            if var_entry["part"] == "o"
-        )
+    def minCo2CostAlltransport(self):
+        func1 = self.minCo2Cost()
+        func2 = self.minCostAlltransport()
+        return func1 + func2
 
-        return func1 + func2 + func3 + func4 + func5
+    def minCo2CostAirOs(self):
+        func1 = self.minCostAir()
+        func2 = self.minOpenincost()
+        return func1 + func2
 
-    def minCostsWithO(self):
-        obj_func = (
-            sum(
-                j["var"] * distancesMap[j["start"]][j["dest"]] * transportcost["air"]
-                for j in self.decision_vars
-            )
-            + sum(
-                l["var"] * variablecost[l["start"]]
-                for l in self.decision_vars
-                if l["part"] == "o"
-            )
-            + sum(
-                1250000 * var_entry["build"]
-                for var_entry in self.decision_vars
-                if var_entry["part"] == "o"
-            )
-            + sum(
-                j["var"] * sourcingcost[j["start"]]
-                for j in self.decision_vars
-                if j["part"] == "z"
-            )
-            + sum(
-                j["var"] * handlingcost[j["start"]]
-                for j in self.decision_vars
-                if j["part"] == "y" or j["part"] == "x"
-            )
-        )
-        return obj_func
+    def minCostAirOs(self):
+        func1 = self.minCostAir()
+        func2 = self.minOpenincost()
+        return func1 + func2
 
 
-# add or choose opjective function
-minCostsWithO = ElectronicManufacturerModel("Os", True, True)
-minCostsWithO.addCo2Const(38)
-obj_func = minCostsWithO.minCostsWithO()
-minCostsWithO.opt_mod.setObjective(obj_func, GRB.MINIMIZE)
-minCostsWithO.opt_mod.optimize()
-minCostsWithO.report()
+scenario1 = ElectronicManufacturerModel("Scenario1", False, False)
+scenario1.setOpjectivefunctionMinimize(scenario1.minCostAir)
+scenario1.opt_mod.optimize()
+scenario1.report()
+
+scenario2 = ElectronicManufacturerModel("Scenario2", False, True)
+scenario2.setOpjectivefunctionMinimize(scenario2.minCostAirOs)
+scenario2.opt_mod.optimize()
+scenario2.report()
+
+scenario3 = ElectronicManufacturerModel("Scenario3", True, True)
+scenario3.setOpjectivefunctionMinimize(scenario3.minCo2CostAlltransportOs)
+scenario3.opt_mod.optimize()
+scenario3.report()
