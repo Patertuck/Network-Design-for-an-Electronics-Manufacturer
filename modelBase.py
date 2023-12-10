@@ -3,7 +3,10 @@ from gurobipy import *
 
 
 class ElectronicManufacturerModel:
-    def __init__(self, name):
+    def __init__(self, name, allTransports, withOptionalSources):
+        self.withOptionalSources = withOptionalSources
+        self.withAllTransport = allTransports
+        self.transportTypes = ["air", "sea", "road"] if allTransports else ["air"]
         self.opt_mod = Model(name=f"{name}")
         self.decision_vars = []
         self.initializeBaseModel()
@@ -16,7 +19,8 @@ class ElectronicManufacturerModel:
         self.addDesicionVariablesZ()
         self.addDesicionVariablesY()
         self.addDesicionVariablesX()
-        self.addDesicionVariableO()
+        if self.withOptionalSources:
+            self.addDesicionVariableO()
         self.addConstraintsNonNegative()
         self.addConstraintRetailers()
         self.addConstraintDc()
@@ -25,7 +29,7 @@ class ElectronicManufacturerModel:
     def addDesicionVariablesX(self):
         for dc in DC:
             for retailer in RETAILER:
-                for k in co2cost.keys():
+                for k in self.transportTypes:
                     varname = (
                         "x"
                         + k
@@ -47,7 +51,7 @@ class ElectronicManufacturerModel:
     def addDesicionVariablesY(self):
         for cd in CD:
             for dc in DC:
-                for k in transportTypes:
+                for k in self.transportTypes:
                     varname = (
                         "y" + k + str(cd["LocationID"]) + "-" + str(dc["LocationID"])
                     )
@@ -65,7 +69,7 @@ class ElectronicManufacturerModel:
     def addDesicionVariablesZ(self):
         for source in SOURCE:
             for cd in CD:
-                for k in transportTypes:
+                for k in self.transportTypes:
                     if k == "road":
                         continue
                     varname = (
@@ -90,7 +94,7 @@ class ElectronicManufacturerModel:
         big_M = 10000000000
         for optionalSource in OPTIONALSOURCE:
             for dc in DC:
-                for k in transportTypes:
+                for k in self.transportTypes:
                     varname = (
                         "o"
                         + str(optionalSource["LocationID"])
@@ -176,11 +180,11 @@ class ElectronicManufacturerModel:
                 == amount_dc
             )
 
-    def addCo2Const(self, opt_mod, decision_vars, upperBoundCo2):
+    def addCo2Const(self, upperBoundCo2):
         self.opt_mod.addConstr(
             sum(
                 v["var"] * co2cost[v["mode"]] * distancesMap[v["start"]][v["dest"]]
-                for v in decision_vars
+                for v in self.decision_vars
             )
             / GRAMM_TO_TONNE
             <= upperBoundCo2
@@ -240,11 +244,17 @@ class ElectronicManufacturerModel:
             j["var"].x
             * (
                 distancesMap[j["start"]][j["dest"]]
-                * (transportcost[j["mode"]] + slowcost[j["mode"]])
+                * (
+                    transportcost[j["mode"]]
+                    + (slowcost[j["mode"]] if self.withAllTransport else 0)
+                )
                 + locationCosts[j["part"]][j["start"]]
             )
             for j in self.decision_vars
         )
+        for j in self.decision_vars:
+            if j["part"] == "o":
+                totalCost += j["build"].x * OPENINGCOST
         return totalCost
 
     def getTransportCost(self):
@@ -262,7 +272,6 @@ class ElectronicManufacturerModel:
         return slownessCost
 
     def getSourcingCost(self):
-        print(sourcingcost)
         sourcingCosts = sum(
             (v["var"].x * locationCosts[v["part"]][v["start"]])
             if v["part"] == "z"
@@ -303,7 +312,7 @@ class ElectronicManufacturerModel:
         for v in self.decision_vars:
             if v["part"] == "o":
                 openingCosts += v["build"].x * (OPENINGCOST)
-        return openingcost
+        return openingCosts
 
     def getLocationAmounts(self):
         for v in self.decision_vars:
@@ -337,7 +346,8 @@ class ElectronicManufacturerModel:
         print("------- Costs --------")
         print()
         print(f"Total cost: {self.getTotalCost()} Euro")
-        print(f"Slowness cost: {self.getSlownesCost()} Euro")
+        if self.withAllTransport:
+            print(f"Slowness cost: {self.getSlownesCost()} Euro")
         print(f"Transportation cost: {self.getTransportCost()} Euro")
         print(f"Sourcing costs: {self.getSourcingCost()} Euro")
         print(f"Handling costs at cross docs: {self.getHandlingCostCd()} Euro")
@@ -349,7 +359,7 @@ class ElectronicManufacturerModel:
         print()
         print("------- Emissions -------")
         print()
-        print(f"Total Co2 emissions: {self.getCo2EmissionsInT()}t")
+        print(f"Total Co2 emissions: {self.getCo2EmissionsInT()} t")
         print(f"Cost for compensation: {self.getCo2EmissionsInT() * CO2PRICE} Euro")
         print(f"Emissions between retailer and cross doc: {self.getCo2EmissionZ()} t")
         print(
@@ -452,30 +462,27 @@ class ElectronicManufacturerModel:
     def minCostsWithO(self):
         obj_func = (
             sum(
-                j["var"] * distance_entry["distance"] * transportcost["air"]
-                for j in minCostsWithO.decision_vars
-                for distance_entry in distance_data
-                if distance_entry["start"] == j["start"]
-                and distance_entry["end"] == j["dest"]
+                j["var"] * distancesMap[j["start"]][j["dest"]] * transportcost["air"]
+                for j in self.decision_vars
             )
             + sum(
                 l["var"] * variablecost[l["start"]]
-                for l in minCostsWithO.decision_vars
+                for l in self.decision_vars
                 if l["part"] == "o"
             )
             + sum(
                 1250000 * var_entry["build"]
-                for var_entry in minCostsWithO.decision_vars
+                for var_entry in self.decision_vars
                 if var_entry["part"] == "o"
             )
             + sum(
                 j["var"] * sourcingcost[j["start"]]
-                for j in minCostsWithO.decision_vars
+                for j in self.decision_vars
                 if j["part"] == "z"
             )
             + sum(
                 j["var"] * handlingcost[j["start"]]
-                for j in minCostsWithO.decision_vars
+                for j in self.decision_vars
                 if j["part"] == "y" or j["part"] == "x"
             )
         )
@@ -483,7 +490,8 @@ class ElectronicManufacturerModel:
 
 
 # add or choose opjective function
-minCostsWithO = ElectronicManufacturerModel("Os")
+minCostsWithO = ElectronicManufacturerModel("Os", True, True)
+minCostsWithO.addCo2Const(38)
 obj_func = minCostsWithO.minCostsWithO()
 minCostsWithO.opt_mod.setObjective(obj_func, GRB.MINIMIZE)
 minCostsWithO.opt_mod.optimize()
