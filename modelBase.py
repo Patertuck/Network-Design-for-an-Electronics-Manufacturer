@@ -308,10 +308,12 @@ class ElectronicManufacturerModel:
         return variableCost
 
     def getOpeningCosts(self):
+        alreadyDone = []
         openingCosts = 0
         for v in self.decision_vars:
-            if v["part"] == "o":
+            if v["part"] == "o" and v["start"] not in alreadyDone:
                 openingCosts += v["build"].x * (OPENINGCOST)
+                alreadyDone.append(v["start"])
         return openingCosts
 
     def getLocationAmounts(self):
