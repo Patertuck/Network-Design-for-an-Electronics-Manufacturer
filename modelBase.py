@@ -462,12 +462,9 @@ class ElectronicManufacturerModel:
         return minEmissions
 
     def minOpenincost(self):
-        
         costs = 0
         for v in self.os_vars:
-            costs += v["var"] * OPENINGCOST
-            print(costs)         
-        
+            costs += v["var"] * OPENINGCOST           
         return costs
 
     def minCo2CostAlltransportOs(self):
