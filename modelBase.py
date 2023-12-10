@@ -8,6 +8,7 @@ class ElectronicManufacturerModel:
         self.withAllTransport = allTransports
         self.transportTypes = ["air", "sea", "road"] if allTransports else ["air"]
         self.opt_mod = Model(name=f"{name}")
+        self.os_vars = []
         self.decision_vars = []
         self.initializeBaseModel()
         self.DC_amount = {key["LocationID"]: 0 for key in DC}
@@ -93,6 +94,17 @@ class ElectronicManufacturerModel:
     def addDesicionVariableO(self):
         big_M = 10000000000
         for optionalSource in OPTIONALSOURCE:
+            vname = "o" + str(optionalSource["LocationID"]) + "_build"
+            build = self.opt_mod.addVar(name=vname, vtype=BINARY)
+            os_var_entry = {
+                "var": build,
+                "part": "o",
+                "start": optionalSource["LocationID"],
+                "dest": optionalSource["LocationID"],
+                "mode": "None"
+
+            }
+            self.os_vars.append(os_var_entry)
             for dc in DC:
                 for k in self.transportTypes:
                     varname = (
@@ -102,8 +114,7 @@ class ElectronicManufacturerModel:
                         + str(dc["LocationID"])
                     )
                     a = self.opt_mod.addVar(name=varname, vtype=INTEGER, lb=0)
-                    varname_build = varname + "_build"
-                    build = self.opt_mod.addVar(name=varname_build, vtype=BINARY)
+                    
 
                     self.opt_mod.addConstr(a >= 0)
 
@@ -308,13 +319,12 @@ class ElectronicManufacturerModel:
         return variableCost
 
     def getOpeningCosts(self):
-        alreadyDone = []
-        openingCosts = 0
-        for v in self.decision_vars:
-            if v["part"] == "o" and v["start"] not in alreadyDone:
-                openingCosts += v["build"].x * (OPENINGCOST)
-                alreadyDone.append(v["start"])
-        return openingCosts
+        costs = 0
+        for v in self.os_vars:
+            costs += OPENINGCOST * v["var"].x
+                
+        return costs
+        
 
     def getLocationAmounts(self):
         for v in self.decision_vars:
@@ -452,12 +462,12 @@ class ElectronicManufacturerModel:
         return minEmissions
 
     def minOpenincost(self):
-        alreadyDone = []
+        
         costs = 0
-        for v in self.decision_vars:
-            if v["part"] == "o" and v["start"] not in alreadyDone:
-                costs += OPENINGCOST * v["build"]
-                alreadyDone.append(v["start"])
+        for v in self.os_vars:
+            costs += v["var"] * OPENINGCOST
+            print(costs)         
+        
         return costs
 
     def minCo2CostAlltransportOs(self):
