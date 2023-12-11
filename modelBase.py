@@ -365,6 +365,7 @@ class ElectronicManufacturerModel:
                 file.write(f"Slowness cost: {self.getSlownesCost()} Euro\n")
             file.write(f"Transportation cost: {self.getTransportCost()} Euro\n")
             file.write(f"Sourcing costs: {self.getSourcingCost()} Euro\n")
+            file.write(f"Total handling cost: {self.getHandlingCostDc() + self.getHandlingCostCd()} Euro\n")
             file.write(
                 f"Handling costs at cross docs: {self.getHandlingCostCd()} Euro\n"
             )
@@ -401,12 +402,12 @@ class ElectronicManufacturerModel:
             )
             self.getLocationAmounts()
             file.write("\n")
-            file.write(("--------- Amouts --------\n"))
+            file.write(("--------- Amounts --------\n"))
             file.write("\n")
             file.write(f"Sources: {self.SOURCE_amount}\n")
             file.write(f"Cross Docs: {self.CD_amount}\n")
             file.write(f"Distribution centers: {self.DC_amount}\n")
-            file.write(f"Demands ad retailers: {demands}\n")
+            file.write(f"Demands at retailers: {demands}\n")
             file.write(f"Optional sources: {self.OPTIONALSOURCE_amount}\n")
             file.write("\n")
             file.write("--------- end report ------------\n")
@@ -489,17 +490,27 @@ class ElectronicManufacturerModel:
         return func1 + func2
 
 
-scenario1 = ElectronicManufacturerModel("Scenario1", False, False)
+scenario1 = ElectronicManufacturerModel("AirNoOSMinCost", False, False)
 scenario1.setOpjectivefunctionMinimize(scenario1.minCostAir)
 scenario1.opt_mod.optimize()
 scenario1.report()
 
-scenario2 = ElectronicManufacturerModel("Scenario2", False, True)
+scenario2 = ElectronicManufacturerModel("AirOSMinCost", False, True)
 scenario2.setOpjectivefunctionMinimize(scenario2.minCostAirOs)
 scenario2.opt_mod.optimize()
 scenario2.report()
 
-scenario3 = ElectronicManufacturerModel("Scenario3", True, True)
+scenario3 = ElectronicManufacturerModel("AllMinCO2CostWithOS", True, True)
 scenario3.setOpjectivefunctionMinimize(scenario3.minCo2CostAlltransportOs)
 scenario3.opt_mod.optimize()
 scenario3.report()
+
+scenario4 = ElectronicManufacturerModel("AllMinEmissionsNoOS", True, False)
+scenario4.setOpjectivefunctionMinimize(scenario4.minEmissions)
+scenario4.opt_mod.optimize()
+scenario4.report()
+
+scenario5 = ElectronicManufacturerModel("AllMinCostWithoutOS", True, False)
+scenario5.setOpjectivefunctionMinimize(scenario5.minCo2CostAlltransportOs)
+scenario5.opt_mod.optimize()
+scenario5.report()
