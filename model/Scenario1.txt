@@ -1,0 +1,92 @@
+
+----------- start report ----------
+Objective Function Value: 180436865.04014522
+------- Nodes --------
+zairSHA-PLWAW: 231300.0
+zairSHA-PLGDN: 409300.0
+zairSZX-GRPIR: 56900.0
+yairPLWAW-PED: 231300.0
+yairPLGDN-FR6216: 205400.0
+yairPLGDN-RIX: 203900.0
+yairGRPIR-GMZ: 56900.0
+xairFR6216-LWUBI: 4600.0
+xairFR6216-BFJAE: 49900.0
+xairFR6216-GKKAO: 21000.0
+xairFR6216-FFSVQ: 1400.0
+xairFR6216-FLXXC: 1300.0
+xairFR6216-HNQWN: 100.0
+xairFR6216-LZQRS: 60700.0
+xairFR6216-LGVQY: 3700.0
+xairFR6216-ONFHF: 25400.0
+xairFR6216-JOTIJ: 900.0
+xairFR6216-TZDIQ: 28100.0
+xairFR6216-CPFKH: 8300.0
+xairGMZ-BIYNB: 22300.0
+xairGMZ-QWYVZ: 8000.0
+xairGMZ-TWKZB: 22900.0
+xairGMZ-VWDRE: 1200.0
+xairGMZ-FXMHQ: 2500.0
+xairPED-ISNQE: 8800.0
+xairPED-OAHLE: 200.0
+xairPED-RCQWA: 1500.0
+xairPED-FLDNI: 600.0
+xairPED-ALKFM: 100.0
+xairPED-DPTBA: 48800.0
+xairPED-EAVPF: 1600.0
+xairPED-YMCZY: 8700.0
+xairPED-GFFJE: 700.0
+xairPED-XOVLM: 53000.0
+xairPED-HDPGX: 400.0
+xairPED-HLRKF: 200.0
+xairPED-WOCMZ: 100.0
+xairPED-MKABB: 600.0
+xairPED-YSFJD: 200.0
+xairPED-KSJER: 4400.0
+xairPED-XGUTS: 3300.0
+xairPED-NRGLY: 100.0
+xairPED-DUYCE: 16200.0
+xairPED-LGISN: 5100.0
+xairPED-UNDVS: 37300.0
+xairPED-FZAYW: 1900.0
+xairPED-NXAZJ: 13300.0
+xairPED-XPPBI: 14300.0
+xairPED-QXNSQ: 4300.0
+xairPED-KAQWX: 5600.0
+xairRIX-KDCUO: 67800.0
+xairRIX-RUFTR: 100.0
+xairRIX-GXEQH: 2600.0
+xairRIX-FEGXC: 18300.0
+xairRIX-NAAVF: 100.0
+xairRIX-UPKYT: 89000.0
+xairRIX-ZYRVF: 26000.0
+
+------- Costs --------
+
+Total cost without Co2 compensation: 180436865.04014522 Euro
+Transportation cost: 171780865.04014522 Euro
+Sourcing costs: 2092500.0 Euro
+Handling costs at cross docs: 2960700.0 Euro
+Handling costs at distribution centers: 3602800.0 Euro
+Variable costs at optional source: 0 Euro
+Opening costs at optional source: 0 Euro
+
+------- Emissions -------
+
+Total cost with emission compensation: 181707716.2397946 Euro
+Total Co2 emissions: 15885.639995617239 t
+Cost for compensation: 1270851.1996493791 Euro
+Emissions between source and cross doc: 14031.669493842086 t
+Emissions between cross doc and dsitribution center: 1071.573147257116 t
+Emissions between optional source and distribution center: 0.0 t
+Emissions between distribution center and retailer: 782.3973545180378 t
+
+--------- Amouts --------
+
+Sources: {'SHA': 640600.0, 'TW': 0.0, 'SZX': 56900.0}
+Cross Docs: {'FRCDG': 0.0, 'ATVIE': 0.0, 'PLWAW': 231300.0, 'BEANR': 0.0, 'PLGDN': 409300.0, 'GRPIR': 56900.0}
+Distribution centers: {'FR6216': 205400.0, 'GMZ': 56900.0, 'PED': 231300.0, 'RIX': 203900.0}
+Demands ad retailers: {'ISNQE': 8800, 'OAHLE': 200, 'RCQWA': 1500, 'LWUBI': 4600, 'BFJAE': 49900, 'GKKAO': 21000, 'FFSVQ': 1400, 'FLXXC': 1300, 'HNQWN': 100, 'LZQRS': 60700, 'FLDNI': 600, 'LGVQY': 3700, 'ONFHF': 25400, 'JOTIJ': 900, 'TZDIQ': 28100, 'ALKFM': 100, 'CPFKH': 8300, 'DPTBA': 48800, 'EAVPF': 1600, 'YMCZY': 8700, 'GFFJE': 700, 'XOVLM': 53000, 'HDPGX': 400, 'HLRKF': 200, 'WOCMZ': 100, 'MKABB': 600, 'YSFJD': 200, 'KSJER': 4400, 'XGUTS': 3300, 'NRGLY': 100, 'KDCUO': 67800, 'DUYCE': 16200, 'LGISN': 5100, 'UNDVS': 37300, 'FZAYW': 1900, 'NXAZJ': 13300, 'XPPBI': 14300, 'QXNSQ': 4300, 'BIYNB': 22300, 'QWYVZ': 8000, 'TWKZB': 22900, 'RUFTR': 100, 'GXEQH': 2600, 'FEGXC': 18300, 'KAQWX': 5600, 'NAAVF': 100, 'UPKYT': 89000, 'VWDRE': 1200, 'ZYRVF': 26000, 'FXMHQ': 2500}
+Optional sources: {'DEAVU': 0, 'PLZCA': 0, 'HUDTG': 0, 'FIMPF': 0, 'IEILG': 0, 'ITJXK': 0, 'CZMCT': 0, 'SEJLZ': 0, 'ESBNG': 0, 'UKFCE': 0}
+
+--------- end report ------------
+

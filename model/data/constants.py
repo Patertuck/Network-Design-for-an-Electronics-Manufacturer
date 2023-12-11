@@ -18,7 +18,7 @@ SOURCE = []
 RETAILER = []
 OPTIONALSOURCE = []
 DATAENTRYATTS = []
-CO2PRICE = 70
+CO2PRICE = 80
 OPENINGCOST = 1250000
 GRAMM_TO_TONNE = 1000000
 
@@ -167,7 +167,7 @@ OPTIONALSOURCE_amount = {key["LocationID"]: 0 for key in OPTIONALSOURCE}
 
 
 # --- Costs, minimize, parameters in objective function ---------------------------------
-
+transportTypes = ["air", "sea", "road"]
 co2cost = {
     # per unit/kilometer
     "air": 971 / (1000 / 2.58),  # 971 for tonne
