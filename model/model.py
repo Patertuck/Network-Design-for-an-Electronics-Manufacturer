@@ -15,6 +15,10 @@ class ElectronicManufacturerModel:
         self.CD_amount = {key["LocationID"]: 0 for key in CD}
         self.SOURCE_amount = {key["LocationID"]: 0 for key in SOURCE}
         self.OPTIONALSOURCE_amount = {key["LocationID"]: 0 for key in OPTIONALSOURCE}
+        self.co2prize = CO2PRICE
+
+    def setCo2price(self, co2price):
+        self.co2prize = co2price
 
     def initializeBaseModel(self):
         self.addDesicionVariablesZ()
@@ -22,6 +26,7 @@ class ElectronicManufacturerModel:
         self.addDesicionVariablesX()
         if self.withOptionalSources:
             self.addDesicionVariableO()
+            self.addConstraintOs()
         self.addConstraintsNonNegative()
         self.addConstraintRetailers()
         self.addConstraintDc()
@@ -92,7 +97,7 @@ class ElectronicManufacturerModel:
                     self.decision_vars.append(var_entry)
 
     def addDesicionVariableO(self):
-        big_M = 10000000000
+        big_M = 500000
         for optionalSource in OPTIONALSOURCE:
             vname = "o" + str(optionalSource["LocationID"]) + "_build"
             build = self.opt_mod.addVar(name=vname, vtype=BINARY)
@@ -117,6 +122,8 @@ class ElectronicManufacturerModel:
                     self.opt_mod.addConstr(a >= 0)
 
                     self.opt_mod.addConstr(a <= big_M * build)
+
+                    self.opt_mod.addConstr(a >= build / big_M)
 
                     var_entry = {
                         "var": a,
@@ -188,6 +195,15 @@ class ElectronicManufacturerModel:
                 )
                 == amount_dc
             )
+
+    def addConstraintOs(self):
+        for os in OPTIONALSOURCE:
+            amoutOs = sum(
+                j["var"]
+                for j in self.decision_vars
+                if j["part"] == "o" and j["start"] == os["LocationID"]
+            )
+            self.opt_mod.addConstr(amoutOs <= 500000)
 
     def addCo2Const(self, upperBoundCo2):
         self.opt_mod.addConstr(
@@ -266,6 +282,10 @@ class ElectronicManufacturerModel:
                 totalCost += j["var"].x * OPENINGCOST
 
         return totalCost
+
+    def getTotalCostwithC02(self):
+        TotalCost = self.getCo2EmissionsInT() * self.co2prize + self.getTotalCost()
+        return TotalCost
 
     def getTransportCost(self):
         transportC = sum(
@@ -379,14 +399,14 @@ class ElectronicManufacturerModel:
             file.write("------- Emissions -------\n")
             file.write("\n")
             file.write(
-                f"Total cost with emission compensation: {self.getCo2EmissionsInT() * CO2PRICE + self.getTotalCost()} Euro\n"
+                f"Total cost with emission compensation: {self.getTotalCostwithC02()} Euro\n"
             )
             file.write(f"Total Co2 emissions: {self.getCo2EmissionsInT()} t\n")
             file.write(
-                f"Cost for compensation: {self.getCo2EmissionsInT() * CO2PRICE} Euro\n"
+                f"Cost for compensation: {self.getCo2EmissionsInT() * self.co2prize} Euro\n"
             )
             file.write(
-                f"Emissions between retailer and cross doc: {self.getCo2EmissionZ()} t\n"
+                f"Emissions between source and cross doc: {self.getCo2EmissionZ()} t\n"
             )
             file.write(
                 f"Emissions between cross doc and dsitribution center: {self.getCo2EmissionY()} t\n"
@@ -439,7 +459,7 @@ class ElectronicManufacturerModel:
 
     def minCo2Cost(self):
         minCosts = (
-            CO2PRICE
+            self.co2prize
             * sum(
                 j["var"] * distancesMap[j["start"]][j["dest"]] * co2cost[j["mode"]]
                 for j in self.decision_vars
@@ -491,18 +511,24 @@ class ElectronicManufacturerModel:
         func2 = self.minOpenincost()
         return func1 + func2
 
+    def minCostAndEmissionsWeighted(self, co2Weight, costWeight):
+        func1 = self.minCostAlltransportOs()
+        func2 = self.minEmissions()
+        return costWeight * func1 + co2Weight * func2
 
-scenario1 = ElectronicManufacturerModel("Scenario1", False, False)
-scenario1.setOpjectivefunctionMinimize(scenario1.minCostAir)
-scenario1.opt_mod.optimize()
-scenario1.report()
 
-scenario2 = ElectronicManufacturerModel("Scenario2", False, True)
-scenario2.setOpjectivefunctionMinimize(scenario2.minCostAirOs)
-scenario2.opt_mod.optimize()
-scenario2.report()
+if __name__ == "__main__":
+    scenario1 = ElectronicManufacturerModel("Scenario1", False, False)
+    scenario1.setOpjectivefunctionMinimize(scenario1.minCostAir)
+    scenario1.opt_mod.optimize()
+    scenario1.report()
 
-scenario3 = ElectronicManufacturerModel("Scenario3", True, True)
-scenario3.setOpjectivefunctionMinimize(scenario3.minCo2CostAlltransportOs)
-scenario3.opt_mod.optimize()
-scenario3.report()
+    scenario2 = ElectronicManufacturerModel("Scenario2", False, True)
+    scenario2.setOpjectivefunctionMinimize(scenario2.minCostAirOs)
+    scenario2.opt_mod.optimize()
+    scenario2.report()
+
+    scenario3 = ElectronicManufacturerModel("Scenario3", True, True)
+    scenario3.setOpjectivefunctionMinimize(scenario3.minCo2CostAlltransportOs)
+    scenario3.opt_mod.optimize()
+    scenario3.report()

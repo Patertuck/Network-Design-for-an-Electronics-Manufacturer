@@ -1,6 +1,6 @@
 
 ----------- start report ----------
-Objective Function Value: 20206551.64636218
+Objective Function Value: 20207211.604523763
 ------- Nodes --------
 xroadFR6216-LWUBI: 4600.0
 xroadFR6216-BFJAE: 49900.0
@@ -14,6 +14,7 @@ xroadFR6216-ONFHF: 25400.0
 xroadFR6216-JOTIJ: 900.0
 xroadFR6216-TZDIQ: 28100.0
 xroadFR6216-CPFKH: 8300.0
+xroadGMZ-TWKZB: 6.0
 xroadPED-ISNQE: 8800.0
 xroadPED-OAHLE: 200.0
 xroadPED-RCQWA: 1500.0
@@ -41,7 +42,7 @@ xroadPED-XPPBI: 14300.0
 xroadPED-QXNSQ: 4300.0
 xroadPED-BIYNB: 22300.0
 xroadPED-QWYVZ: 8000.0
-xroadPED-TWKZB: 22900.0
+xroadPED-TWKZB: 22894.0
 xroadPED-KAQWX: 5600.0
 xroadPED-VWDRE: 1200.0
 xroadPED-FXMHQ: 2500.0
@@ -53,39 +54,60 @@ xroadRIX-NAAVF: 100.0
 xroadRIX-UPKYT: 89000.0
 xroadRIX-ZYRVF: 26000.0
 oFIMPF_build: 1.0
-oFIMPF-RIX: 203900.0
+oFIMPF-FR6216: 1.0
+oFIMPF-FR6216: 1.0
+oFIMPF-FR6216: 1.0
+oFIMPF-GMZ: 1.0
+oFIMPF-GMZ: 1.0
+oFIMPF-GMZ: 1.0
+oFIMPF-PED: 1.0
+oFIMPF-PED: 1.0
+oFIMPF-PED: 1.0
+oFIMPF-RIX: 1.0
+oFIMPF-RIX: 1.0
+oFIMPF-RIX: 203895.0
 oCZMCT_build: 1.0
-oCZMCT-FR6216: 205400.0
-oCZMCT-PED: 288200.0
+oCZMCT-FR6216: 1.0
+oCZMCT-FR6216: 1.0
+oCZMCT-FR6216: 205395.0
+oCZMCT-GMZ: 1.0
+oCZMCT-GMZ: 1.0
+oCZMCT-GMZ: 1.0
+oCZMCT-PED: 1.0
+oCZMCT-PED: 1.0
+oCZMCT-PED: 288189.0
+oCZMCT-RIX: 1.0
+oCZMCT-RIX: 1.0
+oCZMCT-RIX: 1.0
 
 ------- Costs --------
 
-Total cost without Co2 compensation: 20196441.179471992 Euro
-Slowness cost: 1740250.191472726 Euro
-Transportation cost: 8979690.987999268 Euro
+Total cost without Co2 compensation: 20197099.347306143 Euro
+Slowness cost: 1740722.6931125775 Euro
+Transportation cost: 8979864.654193567 Euro
 Sourcing costs: 0.0 Euro
 Handling costs at cross docs: 0.0 Euro
-Handling costs at distribution centers: 3489000.0 Euro
+Handling costs at distribution centers: 3489012.0 Euro
 Variable costs at optional source: 3487500.0 Euro
 Opening costs at optional source: 2500000.0 Euro
 
 ------- Emissions -------
 
-Total cost with emission compensation: 20206551.646362185 Euro
-Total Co2 emissions: 126.38083612739707 t
-Cost for compensation: 10110.466890191767 Euro
-Emissions between retailer and cross doc: 0.0 t
+Total cost with emission compensation: 20207211.60452376 Euro
+Total Co2 emissions: 126.40321522018415 t
+Cost for compensation: 10112.257217614731 Euro
+Emissions between source and cross doc: 0.0 t
 Emissions between cross doc and dsitribution center: 0.0 t
-Emissions between optional source and distribution center: 53.21646179146145 t
-Emissions between distribution center and retailer: 73.16437433593563 t
+Emissions between optional source and distribution center: 53.24057083454265 t
+Emissions between distribution center and retailer: 73.16264438564147 t
 
 --------- Amouts --------
 
 Sources: {'SHA': 0.0, 'TW': 0.0, 'SZX': 0.0}
 Cross Docs: {'FRCDG': 0.0, 'ATVIE': 0.0, 'PLWAW': 0.0, 'BEANR': 0.0, 'PLGDN': 0.0, 'GRPIR': 0.0}
-Distribution centers: {'FR6216': 205400.0, 'GMZ': 0.0, 'PED': 288200.0, 'RIX': 203900.0}
+Distribution centers: {'FR6216': 205400.0, 'GMZ': 6.0, 'PED': 288194.0, 'RIX': 203900.0}
 Demands ad retailers: {'ISNQE': 8800, 'OAHLE': 200, 'RCQWA': 1500, 'LWUBI': 4600, 'BFJAE': 49900, 'GKKAO': 21000, 'FFSVQ': 1400, 'FLXXC': 1300, 'HNQWN': 100, 'LZQRS': 60700, 'FLDNI': 600, 'LGVQY': 3700, 'ONFHF': 25400, 'JOTIJ': 900, 'TZDIQ': 28100, 'ALKFM': 100, 'CPFKH': 8300, 'DPTBA': 48800, 'EAVPF': 1600, 'YMCZY': 8700, 'GFFJE': 700, 'XOVLM': 53000, 'HDPGX': 400, 'HLRKF': 200, 'WOCMZ': 100, 'MKABB': 600, 'YSFJD': 200, 'KSJER': 4400, 'XGUTS': 3300, 'NRGLY': 100, 'KDCUO': 67800, 'DUYCE': 16200, 'LGISN': 5100, 'UNDVS': 37300, 'FZAYW': 1900, 'NXAZJ': 13300, 'XPPBI': 14300, 'QXNSQ': 4300, 'BIYNB': 22300, 'QWYVZ': 8000, 'TWKZB': 22900, 'RUFTR': 100, 'GXEQH': 2600, 'FEGXC': 18300, 'KAQWX': 5600, 'NAAVF': 100, 'UPKYT': 89000, 'VWDRE': 1200, 'ZYRVF': 26000, 'FXMHQ': 2500}
-Optional sources: {'DEAVU': 0.0, 'PLZCA': 0.0, 'HUDTG': 0.0, 'FIMPF': 203900.0, 'IEILG': 0.0, 'ITJXK': 0.0, 'CZMCT': 493600.0, 'SEJLZ': 0.0, 'ESBNG': 0.0, 'UKFCE': 0.0}
+Optional sources: {'DEAVU': 0.0, 'PLZCA': 0.0, 'HUDTG': 0.0, 'FIMPF': 203906.0, 'IEILG': 0.0, 'ITJXK': 0.0, 'CZMCT': 493594.0, 'SEJLZ': 0.0, 'ESBNG': 0.0, 'UKFCE': 0.0}
 
 --------- end report ------------
 
