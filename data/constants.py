@@ -166,7 +166,7 @@ OPTIONALSOURCE_amount = {key["LocationID"]: 0 for key in OPTIONALSOURCE}
 
 
 # --- Costs, minimize, parameters in objective function ---------------------------------
-
+transportTypes = ["air", "sea", "road"]
 co2cost = {
     # per unit/kilometer
     "air": 971 / (1000 / 2.58),  # 971 for tonne
