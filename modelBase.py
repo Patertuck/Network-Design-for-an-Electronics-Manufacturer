@@ -101,8 +101,7 @@ class ElectronicManufacturerModel:
                 "part": "o",
                 "start": optionalSource["LocationID"],
                 "dest": optionalSource["LocationID"],
-                "mode": "None"
-
+                "mode": "None",
             }
             self.os_vars.append(os_var_entry)
             for dc in DC:
@@ -114,7 +113,6 @@ class ElectronicManufacturerModel:
                         + str(dc["LocationID"])
                     )
                     a = self.opt_mod.addVar(name=varname, vtype=INTEGER, lb=0)
-                    
 
                     self.opt_mod.addConstr(a >= 0)
 
@@ -263,9 +261,10 @@ class ElectronicManufacturerModel:
             )
             for j in self.decision_vars
         )
-        for j in self.decision_vars:
+        for j in self.os_vars:
             if j["part"] == "o":
-                totalCost += j["build"].x * OPENINGCOST
+                totalCost += j["var"].x * OPENINGCOST
+
         return totalCost
 
     def getTransportCost(self):
@@ -322,9 +321,8 @@ class ElectronicManufacturerModel:
         costs = 0
         for v in self.os_vars:
             costs += OPENINGCOST * v["var"].x
-                
+
         return costs
-        
 
     def getLocationAmounts(self):
         for v in self.decision_vars:
@@ -464,8 +462,13 @@ class ElectronicManufacturerModel:
     def minOpenincost(self):
         costs = 0
         for v in self.os_vars:
-            costs += v["var"] * OPENINGCOST           
+            costs += v["var"] * OPENINGCOST
         return costs
+
+    def minCostAlltransportOs(self):
+        func1 = self.minCostAlltransport()
+        func2 = self.minOpenincost()
+        return func1 + func2
 
     def minCo2CostAlltransportOs(self):
         func1 = self.minCo2Cost()

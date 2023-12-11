@@ -1,6 +1,6 @@
 
 ----------- start report ----------
-Objective Function Value: 180436865.04014525
+Objective Function Value: 180436865.04014522
 ------- Nodes --------
 zairSHA-PLWAW: 231300.0
 zairSHA-PLGDN: 409300.0
@@ -72,9 +72,9 @@ Opening costs at optional source: 0 Euro
 
 ------- Emissions -------
 
-Total cost with emission compensation: 181548859.83983842 Euro
+Total cost with emission compensation: 181707716.2397946 Euro
 Total Co2 emissions: 15885.639995617239 t
-Cost for compensation: 1111994.7996932068 Euro
+Cost for compensation: 1270851.1996493791 Euro
 Emissions between retailer and cross doc: 14031.669493842086 t
 Emissions between cross doc and dsitribution center: 1071.573147257116 t
 Emissions between optional source and distribution center: 0.0 t
