@@ -494,27 +494,17 @@ class ElectronicManufacturerModel:
         return func1 + func2
 
 
-scenario1 = ElectronicManufacturerModel("AirNoOSMinCost", False, False)
+scenario1 = ElectronicManufacturerModel("Scenario 1", False, False)
 scenario1.setObjectivefunctionMinimize(scenario1.minCostAir)
 scenario1.opt_mod.optimize()
 scenario1.report()
 
-scenario2 = ElectronicManufacturerModel("AirOSMinCost", False, True)
+scenario2 = ElectronicManufacturerModel("Scenario 2", False, True)
 scenario2.setObjectivefunctionMinimize(scenario2.minCostAirOs)
 scenario2.opt_mod.optimize()
 scenario2.report()
 
-scenario3 = ElectronicManufacturerModel("AllMinCO2CostWithOS", True, True)
+scenario3 = ElectronicManufacturerModel("Scenario 3", True, True)
 scenario3.setObjectivefunctionMinimize(scenario3.minCo2CostAlltransportOs)
 scenario3.opt_mod.optimize()
 scenario3.report()
-
-scenario4 = ElectronicManufacturerModel("AllMinEmissionsNoOS", True, False)
-scenario4.setObjectivefunctionMinimize(scenario4.minEmissions)
-scenario4.opt_mod.optimize()
-scenario4.report()
-
-scenario5 = ElectronicManufacturerModel("AllMinCostWithoutOS", True, False)
-scenario5.setObjectivefunctionMinimize(scenario5.minCo2CostAlltransportOs)
-scenario5.opt_mod.optimize()
-scenario5.report()
