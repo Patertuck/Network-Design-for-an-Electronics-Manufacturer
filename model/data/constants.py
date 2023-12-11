@@ -60,6 +60,7 @@ def get_data_entries():
 
     return data_entries
 
+
 def get_distance_data():
     distance_read = pd.read_csv(path + "/distances.csv", delimiter=";")
     distance_data = []
