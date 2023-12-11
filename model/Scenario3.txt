@@ -1,4 +1,3 @@
-
 ----------- start report ----------
 Objective Function Value: 20207211.604523763
 ------- Nodes --------
