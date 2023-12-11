@@ -488,6 +488,11 @@ class ElectronicManufacturerModel:
         func2 = self.minOpenincost()
         return func1 + func2
 
+    def minCostAlltransportOs(self):
+        func1 = self.minCostAlltransport()
+        func2 = self.minOpenincost()
+        return func1 + func2
+
 
 scenario1 = ElectronicManufacturerModel("AirNoOSMinCost", False, False)
 scenario1.setObjectivefunctionMinimize(scenario1.minCostAir)
