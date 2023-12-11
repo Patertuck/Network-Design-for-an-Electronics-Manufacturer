@@ -263,9 +263,8 @@ class ElectronicManufacturerModel:
             )
             for j in self.decision_vars
         )
-        for j in self.decision_vars:
-            if j["part"] == "o":
-                totalCost += j["build"].x * OPENINGCOST
+        for j in self.os_vars:
+            totalCost += j["var"].x * OPENINGCOST
         return totalCost
 
     def getTransportCost(self):
@@ -503,3 +502,8 @@ scenario3 = ElectronicManufacturerModel("Scenario3", True, True)
 scenario3.setOpjectivefunctionMinimize(scenario3.minCo2CostAlltransportOs)
 scenario3.opt_mod.optimize()
 scenario3.report()
+
+scenario3MinCO2NoOs = ElectronicManufacturerModel("scenario3MinCO2NoOS", True, False)
+scenario3MinCO2NoOs.setOpjectivefunctionMinimize(scenario3MinCO2NoOs.minEmissions)
+scenario3MinCO2NoOs.opt_mod.optimize()
+scenario3MinCO2NoOs.report()
