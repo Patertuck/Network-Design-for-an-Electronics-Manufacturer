@@ -388,7 +388,7 @@ class ElectronicManufacturerModel:
                 f"Cost for compensation: {self.getCo2EmissionsInT() * CO2PRICE} Euro\n"
             )
             file.write(
-                f"Emissions between retailer and cross doc: {self.getCo2EmissionZ()} t\n"
+                f"Emissions between source and cross doc: {self.getCo2EmissionZ()} t\n"
             )
             file.write(
                 f"Emissions between cross doc and distribution center: {self.getCo2EmissionY()} t\n"
