@@ -1,6 +1,6 @@
 
 ----------- start report ----------
-Objective Function Value: 20205287.838000912
+Objective Function Value: 20206551.646362185
 ------- Nodes --------
 xroadFR6216-LWUBI: 4600.0
 xroadFR6216-BFJAE: 49900.0
@@ -60,7 +60,7 @@ oCZMCT-PED: 288200.0
 
 ------- Costs --------
 
-Total cost without Co2 compensation: 47696441.17947199 Euro
+Total cost without Co2 compensation: 20196441.179471992 Euro
 Slowness cost: 1740250.191472726 Euro
 Transportation cost: 8979690.987999268 Euro
 Sourcing costs: 0.0 Euro
@@ -71,9 +71,9 @@ Opening costs at optional source: 2500000.0 Euro
 
 ------- Emissions -------
 
-Total cost with emission compensation: 47705287.83800091 Euro
+Total cost with emission compensation: 20206551.646362185 Euro
 Total Co2 emissions: 126.38083612739707 t
-Cost for compensation: 8846.658528917795 Euro
+Cost for compensation: 10110.466890191767 Euro
 Emissions between retailer and cross doc: 0.0 t
 Emissions between cross doc and dsitribution center: 0.0 t
 Emissions between optional source and distribution center: 53.21646179146145 t

@@ -263,9 +263,8 @@ class ElectronicManufacturerModel:
             )
             for j in self.decision_vars
         )
-        for j in self.decision_vars:
-            if j["part"] == "o":
-                totalCost += j["build"].x * OPENINGCOST
+        for j in self.os_vars:
+            totalCost += j["var"].x * OPENINGCOST
         return totalCost
 
     def getTransportCost(self):
